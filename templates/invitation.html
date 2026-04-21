@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ couple.bride_name }} & {{ couple.groom_name }} - Wedding Invitation</title>
+    <!-- Tailwind CSS Script -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Dynamic Google Fonts Loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family={{ couple.font_family_serif|replace(' ', '+') }}:ital,wght@0,300;0,400;0,600;1,400&family={{ couple.font_family_sans|replace(' ', '+') }}:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"{{ couple.font_family_serif }}"', 'serif'],
+                        sans: ['"{{ couple.font_family_sans }}"', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-dark': '#2c2c2c',
+                        'brand-primary': '{{ couple.primary_color }}',
+                        'brand-secondary': '{{ couple.secondary_color }}',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Essential Reset for Hybrid Layout */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { 
+            background-color: #e5e7eb; /* Gray background for desktop */
+            scroll-behavior: smooth;
+        }
+        
+        /* Mobile Container: Strictly 480px max-width, centered */
+        .mobile-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: {{ couple.secondary_color }};
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Prevent Gaps Between Images and Sections */
+        img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        section {
+            width: 100%;
+            display: block;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <div class="mobile-container text-brand-dark">
+        
+        <!-- 1. Cover Section -->
+        <section id="cover">
+            {% if couple.cover_image_url %}
+            <img src="{{ couple.cover_image_url }}" alt="Cover Image" class="w-full">
+            {% else %}
+            <div class="w-full aspect-[3/4] bg-gray-100 flex items-center justify-center text-gray-400 font-serif italic italic text-xl">Kapak Görseli</div>
+            {% endif %}
+        </section>
+
+        <!-- 2. Countdown Section (Code) -->
+        {% if 'details' in active_sections %}
+        <section id="countdown" class="py-16 px-8 text-center bg-white">
+            <h2 class="text-xs uppercase tracking-[0.4em] font-medium text-gray-500 mb-8">Save the Date</h2>
+            <div class="flex justify-center items-center gap-4 text-brand-primary font-serif">
+                <div class="flex flex-col">
+                    <span id="days" class="text-5xl md:text-6xl font-light">00</span>
+                    <span class="text-[10px] uppercase tracking-widest mt-2 text-gray-400">Days</span>
+                </div>
+                <span class="text-4xl font-light mb-8">:</span>
+                <div class="flex flex-col">
+                    <span id="hours" class="text-5xl md:text-6xl font-light">00</span>
+                    <span class="text-[10px] uppercase tracking-widest mt-2 text-gray-400">Hours</span>
+                </div>
+                <span class="text-4xl font-light mb-8">:</span>
+                <div class="flex flex-col">
+                    <span id="minutes" class="text-5xl md:text-6xl font-light">00</span>
+                    <span class="text-[10px] uppercase tracking-widest mt-2 text-gray-400">Minutes</span>
+                </div>
+            </div>
+            <p class="mt-10 font-serif italic text-xl text-gray-700">{{ couple.event_date.strftime('%B %d, %Y') }}</p>
+        </section>
+        {% endif %}
+
+        <!-- 3. Story Section -->
+        {% if 'story' in active_sections %}
+        <section id="story">
+            {% if couple.story_image_url %}
+            <img src="{{ couple.story_image_url }}" alt="Our Story" class="w-full">
+            {% else %}
+            <div class="w-full aspect-[1/1] bg-gray-50 flex items-center justify-center text-gray-300 font-serif italic">Hikaye Görseli</div>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        <!-- 4. Action Buttons Section (Code) -->
+        <section id="actions" class="py-12 px-6 bg-white flex flex-col gap-4">
+            {% if couple.maps_link and 'map' in active_sections %}
+            <a href="{{ couple.maps_link }}" target="_blank" 
+               class="w-full py-5 border border-brand-primary text-brand-primary text-center text-sm uppercase tracking-[0.2em] font-medium hover:bg-brand-primary hover:text-white transition-all duration-500">
+                Get Directions
+            </a>
+            {% endif %}
+        </section>
+
+        <!-- 5. Thank You Section -->
+        <section id="thankyou">
+            {% if couple.thankyou_image_url %}
+            <img src="{{ couple.thankyou_image_url }}" alt="Thank You" class="w-full">
+            {% else %}
+            <div class="w-full aspect-[4/5] bg-gray-100 flex items-center justify-center text-gray-400 font-serif italic">Teşekkür Görseli</div>
+            {% endif %}
+        </section>
+
+        <!-- 6. RSVP Section (Code) -->
+        {% if 'rsvp' in active_sections %}
+        <section id="rsvp" class="py-20 px-8 bg-brand-secondary">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl text-brand-primary mb-4 italic">Will You Join Us?</h2>
+                <div class="w-12 h-[1px] bg-brand-primary mx-auto mb-4 opacity-30"></div>
+                <p class="text-xs uppercase tracking-widest text-gray-500">Please RSVP by June 1st</p>
+            </div>
+
+            <form id="rsvp-form" class="space-y-8">
+                <div class="relative">
+                    <label class="text-[10px] uppercase tracking-widest text-gray-400 absolute -top-2 left-0 bg-brand-secondary px-1 ml-2">Guest Name</label>
+                    <input type="text" id="guest_name" required 
+                           class="w-full bg-transparent border border-gray-300 px-4 py-4 focus:outline-none focus:border-brand-primary transition-colors text-brand-primary font-serif text-lg">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="relative">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 absolute -top-2 left-0 bg-brand-secondary px-1 ml-2">Status</label>
+                        <select id="attendance_status" required 
+                                class="w-full bg-transparent border border-gray-300 px-4 py-4 focus:outline-none focus:border-brand-primary transition-colors text-brand-primary appearance-none cursor-pointer font-serif">
+                            <option value="Katılıyorum">Yes, I'm coming</option>
+                            <option value="Katılamıyorum">Sorry, I can't make it</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <label class="text-[10px] uppercase tracking-widest text-gray-400 absolute -top-2 left-0 bg-brand-secondary px-1 ml-2">Guest Count</label>
+                        <input type="number" id="guest_count" min="1" max="10" value="1" required 
+                               class="w-full bg-transparent border border-gray-300 px-4 py-4 focus:outline-none focus:border-brand-primary transition-colors text-brand-primary text-center font-serif">
+                    </div>
+                </div>
+
+                <button type="submit" 
+                        class="w-full py-5 bg-brand-primary text-white text-sm uppercase tracking-[0.3em] font-medium hover:bg-black transition-all duration-500 shadow-lg">
+                    Confirm RSVP
+                </button>
+            </form>
+
+            <div id="rsvp-success" class="hidden text-center py-12 animate-fade-in">
+                <p class="font-serif text-3xl text-brand-primary italic mb-4">Thank You!</p>
+                <p class="text-gray-500 text-sm tracking-wide">We've received your response and can't wait to celebrate together.</p>
+            </div>
+
+            <div id="rsvp-error" class="hidden mt-4 text-center text-red-500 text-xs">
+                Something went wrong. Please try again.
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Footer -->
+        <footer class="py-12 bg-white text-center border-t border-gray-100 italic">
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-2 font-sans not-italic">Design by</p>
+            <p class="text-xs text-brand-primary font-serif">Studio Printit</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Countdown Logic ---
+        const eventDateStr = "{{ couple.event_date.isoformat() }}"; // ISO format from Python
+        const eventDate = new Date(eventDateStr + "T20:00:00").getTime(); // Assume 20:00 as per image
+
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+            const daysEl = document.getElementById("days");
+            const hoursEl = document.getElementById("hours");
+            const minutesEl = document.getElementById("minutes");
+
+            if (daysEl) daysEl.innerHTML = days < 10 ? "0" + days : days;
+            if (hoursEl) hoursEl.innerHTML = hours < 10 ? "0" + hours : hours;
+            if (minutesEl) minutesEl.innerHTML = minutes < 10 ? "0" + minutes : minutes;
+
+            if (distance < 0) {
+                clearInterval(x);
+                if (daysEl) daysEl.innerHTML = "00";
+                if (hoursEl) hoursEl.innerHTML = "00";
+                if (minutesEl) minutesEl.innerHTML = "00";
+            }
+        }, 1000);
+
+        // --- RSVP Fetch Logic ---
+        const rsvpForm = document.getElementById('rsvp-form');
+        if (rsvpForm) {
+            rsvpForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const btn = this.querySelector('button[type="submit"]');
+                const guestName = document.getElementById('guest_name').value;
+                const attendanceStatus = document.getElementById('attendance_status').value;
+                const guestCount = document.getElementById('guest_count').value;
+
+                btn.disabled = true;
+                btn.innerHTML = "Sending...";
+
+                try {
+                    const response = await fetch('/api/davetiye/{{ couple.slug }}/rsvp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            guest_name: guestName,
+                            attendance_status: attendanceStatus,
+                            guest_count: parseInt(guestCount)
+                        })
+                    });
+
+                    if (response.ok) {
+                        this.classList.add('hidden');
+                        document.getElementById('rsvp-success').classList.remove('hidden');
+                        document.getElementById('rsvp-success').classList.add('fade-in');
+                    } else {
+                        throw new Error('Failed');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    const errorEl = document.getElementById('rsvp-error');
+                    if (errorEl) errorEl.classList.remove('hidden');
+                    btn.disabled = false;
+                    btn.innerHTML = "Confirm RSVP";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

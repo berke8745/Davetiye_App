@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ couple.bride_name }} & {{ couple.groom_name }} - Davetiye</title>
+    <!-- Tailwind CSS Script for rapid prototyping -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-dark': '#2c2c2c',
+                        'brand-light': '#f9f8f6',
+                        'brand-accent': '#d4af37',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html, body { scroll-behavior: smooth; margin: 0; padding: 0; overflow-x: hidden;}
+        body { font-family: 'Montserrat', sans-serif; background-color: #f9f8f6; color: #2c2c2c; }
+        h1, h2, h3, h4 { font-family: '"Cormorant Garamond"', serif; }
+        .fade-in { animation: fadeIn 2s ease-in-out forwards; }
+        .fade-out { animation: fadeOut 1s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(1.1); pointer-events: none; } }
+        
+        /* Timeline line styles */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background-color: #e5e7eb; /* Tailwind gray-200 */
+            transform: translateX(-50%);
+        }
+        
+        /* Envelope Styles */
+        #envelope-overlay {
+            position: fixed; inset: 0; z-index: 50;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; transition: opacity 1s, transform 1s;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+
+    <!-- Envelope Overlay (Karşılama Ekranı) -->
+    <div id="envelope-overlay">
+        <div class="text-center animate-pulse mb-8">
+            <svg class="w-20 h-20 mx-auto text-brand-accent mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <h2 class="text-3xl md:text-5xl font-serif text-white tracking-widest">{{ couple.envelope_text or 'Davetlisiniz' }}</h2>
+            <p class="text-sm font-light mt-4 tracking-widest uppercase text-gray-300">{{ couple.bride_name }} & {{ couple.groom_name }}</p>
+        </div>
+        <button id="open-envelope" class="px-10 py-4 bg-brand-accent text-white border border-brand-accent hover:bg-transparent hover:text-brand-accent transition-all duration-300 uppercase tracking-widest text-sm focus:outline-none">
+            Davetiyeyi Aç
+        </button>
+    </div>
+
+    <!-- Background Music Audio Removed due to Copyright -->
+
+    <!-- Canva / Image Based Design (Resim Modu) -->
+    {% if couple.is_image_based and couple.canva_image_url %}
+    <section id="canva-design" class="w-full bg-brand-light">
+        <div class="max-w-screen-xl mx-auto">
+            <img src="{{ couple.canva_image_url }}" alt="Davetiye Tasarımı" class="w-full h-auto shadow-xl">
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Hero / Cover Section -->
+    {% if not couple.is_image_based %}
+    <section class="relative w-full h-[100svh] flex items-center justify-center">
+        <!-- Background Image -->
+        <div class="absolute inset-0 w-full h-full bg-cover bg-center" style="background-image: url('{{ couple.cover_image_url }}');">
+            <div class="absolute inset-0 bg-black/40"></div> <!-- Dark Overlay -->
+        </div>
+        
+        <div class="relative z-10 text-center text-white px-4 fade-in">
+            <p class="uppercase tracking-[0.3em] text-sm md:text-base mb-6 font-light">Evleniyoruz</p>
+            <h1 class="text-7xl md:text-9xl font-semibold mb-6 flex flex-col md:flex-row items-center gap-2 md:gap-8">
+                <span>{{ couple.bride_name }}</span> 
+                <span class="text-4xl md:text-7xl italic font-light">&</span> 
+                <span>{{ couple.groom_name }}</span>
+            </h1>
+            <p class="text-lg md:text-2xl font-light tracking-wide mt-4">{{ couple.event_date.strftime('%d.%m.%Y') }}</p>
+        </div>
+
+        <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer" onclick="document.getElementById('story').scrollIntoView();">
+            <svg class="w-8 h-8 text-white/70 hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Our Story Section -->
+    {% if 'story' in active_sections %}
+    <section id="story" class="py-24 md:py-32 px-6 md:px-12 max-w-4xl mx-auto text-center bg-brand-light">
+        <h2 class="text-5xl md:text-6xl font-semibold mb-10 text-brand-dark">Hikayemiz</h2>
+        <p class="text-lg md:text-xl leading-loose font-light text-gray-700">
+            {{ couple.story_text }}
+        </p>
+    </section>
+    {% endif %}
+
+    <!-- Event Details & Countdown Section -->
+    {% if 'details' in active_sections %}
+    <section id="details" class="py-24 md:py-32 px-6 bg-white text-center border-t border-b border-gray-100">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-5xl md:text-6xl font-semibold mb-8 text-brand-dark">Düğün Detayları</h2>
+            <p class="text-2xl mb-4 font-serif italic text-gray-600">{{ couple.location_name }}</p>
+            <p class="text-xl mb-16 font-light text-gray-400 uppercase tracking-widest">{{ couple.event_date.strftime('%B %d, %Y') }}</p>
+
+            <!-- Countdown Timer -->
+            <div class="flex justify-center gap-6 md:gap-12 text-brand-dark">
+                <div class="flex flex-col items-center">
+                    <span id="days" class="text-5xl md:text-7xl font-serif font-light">00</span>
+                    <span class="text-xs md:text-sm uppercase tracking-widest mt-3 text-gray-400">Gün</span>
+                </div>
+                <span class="text-5xl md:text-7xl font-serif font-light text-gray-300">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="hours" class="text-5xl md:text-7xl font-serif font-light">00</span>
+                    <span class="text-xs md:text-sm uppercase tracking-widest mt-3 text-gray-400">Saat</span>
+                </div>
+                <span class="text-5xl md:text-7xl font-serif font-light text-gray-300">:</span>
+                <div class="flex flex-col items-center">
+                    <span id="minutes" class="text-5xl md:text-7xl font-serif font-light">00</span>
+                    <span class="text-xs md:text-sm uppercase tracking-widest mt-3 text-gray-400">Dakika</span>
+                </div>
+                <span class="text-5xl md:text-7xl font-serif font-light text-gray-300 hidden sm:block">:</span>
+                <div class="flex flex-col items-center hidden sm:flex">
+                    <span id="seconds" class="text-5xl md:text-7xl font-serif font-light">00</span>
+                    <span class="text-xs md:text-sm uppercase tracking-widest mt-3 text-gray-400">Saniye</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Program Timeline Section -->
+    {% if program and 'timeline' in active_sections %}
+    <section id="timeline" class="py-24 bg-brand-light">
+        <div class="max-w-3xl mx-auto px-6">
+            <h2 class="text-4xl md:text-5xl font-semibold mb-16 text-brand-dark text-center">Program Akışı</h2>
+            <div class="relative timeline-line">
+                {% for item in program %}
+                <div class="relative z-10 flex items-center justify-between mb-12 w-full">
+                    <!-- Sol Taraf (Left) -->
+                    <div class="w-5/12 text-right pr-4 md:pr-8">
+                        {% if loop.index is odd %}
+                        <p class="text-2xl font-serif text-brand-dark">{{ item.time }}</p>
+                        {% else %}
+                        <p class="text-lg md:text-xl font-light text-gray-600">{{ item.event }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Ortadaki Nokta (Center Dot) -->
+                    <div class="w-4 h-4 bg-brand-accent rounded-full border-4 border-white shadow flex-shrink-0 relative z-20"></div>
+                    
+                    <!-- Sağ Taraf (Right) -->
+                    <div class="w-5/12 text-left pl-4 md:pl-8">
+                        {% if loop.index is odd %}
+                        <p class="text-lg md:text-xl font-light text-gray-600">{{ item.event }}</p>
+                        {% else %}
+                        <p class="text-2xl font-serif text-brand-dark">{{ item.time }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Location (Map) Section -->
+    {% if 'map' in active_sections %}
+    <section id="map" class="bg-gray-100">
+        <div class="w-full h-[50vh] min-h-[400px]">
+            <iframe src="{{ couple.maps_link }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- LCV / RSVP Section -->
+    {% if 'rsvp' in active_sections %}
+    <section id="rsvp" class="py-24 md:py-32 px-6 md:px-12 bg-brand-light text-center">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="text-5xl md:text-6xl font-semibold mb-6 text-brand-dark">L.C.V</h2>
+            <p class="mb-14 text-gray-500 font-light text-lg">Bu mutlu günümüzde yanımızda mısınız?<br> Lütfen durumunuzu bize bildirin.</p>
+            
+            <form id="rsvp-form" class="space-y-8 text-left bg-white p-8 md:p-12 shadow-sm">
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-medium text-gray-600 mb-2">Adınız Soyadınız</label>
+                    <input type="text" id="guest_name" required class="w-full px-0 py-3 bg-transparent border-b border-gray-300 rounded-none focus:outline-none focus:border-brand-dark transition-colors text-lg font-serif">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest font-medium text-gray-600 mb-2">Katılım Durumu</label>
+                        <select id="attendance_status" required class="w-full px-0 py-3 bg-transparent border-b border-gray-300 rounded-none focus:outline-none focus:border-brand-dark appearance-none transition-colors text-lg font-serif cursor-pointer">
+                            <option value="Katılıyorum">Evet, Oradayım</option>
+                            <option value="Katılamıyorum">Maalesef Katılamıyorum</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-widest font-medium text-gray-600 mb-2">Kişi Sayısı</label>
+                        <input type="number" id="guest_count" min="1" max="10" value="1" required class="w-full px-0 py-3 bg-transparent border-b border-gray-300 rounded-none focus:outline-none focus:border-brand-dark transition-colors text-lg font-serif text-center">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs uppercase tracking-widest font-medium text-gray-600 mb-2">Mesajınız (Opsiyonel)</label>
+                    <textarea id="message" rows="2" class="w-full px-0 py-3 bg-transparent border-b border-gray-300 rounded-none focus:outline-none focus:border-brand-dark transition-colors text-lg font-serif resize-none" placeholder="Çifte bir not bırakmak isterseniz..."></textarea>
+                </div>
+                
+                <div class="pt-6">
+                    <button type="submit" class="w-full py-5 bg-brand-dark text-white text-sm uppercase tracking-widest hover:bg-black transition-colors duration-300 font-medium">
+                        Cevabımı İlet
+                    </button>
+                </div>
+            </form>
+
+            <div id="form-success" class="hidden mt-12 p-10 bg-white border border-brand-accent/30 text-center shadow-sm">
+                <p class="font-serif text-3xl mb-4 text-brand-dark">Teşekkürler!</p>
+                <p class="font-light text-gray-600">Katılım durumunuzu heyecanla not aldık.</p>
+            </div>
+            
+            <div id="form-error" class="hidden mt-8 p-6 bg-red-50 text-red-800 border border-red-200">
+                <p class="font-light text-sm">Bir hata oluştu, lütfen tekrar deneyiniz.</p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Footer -->
+    <footer class="py-16 bg-white text-center border-t border-gray-100 flex flex-col items-center justify-center">
+        <p class="text-xs text-gray-400 uppercase tracking-[0.2em] mb-4 font-medium">{{ couple.bride_name }} & {{ couple.groom_name }}</p>
+        <div class="w-12 h-[1px] bg-gray-200 mb-4"></div>
+        <p class="text-xs text-gray-300">Bu davetiye <strong>Studio Printit</strong> tarafından hazırlanmıştır.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Envelope Logic
+        const envelopeOverlay = document.getElementById('envelope-overlay');
+        const openEnvelopeBtn = document.getElementById('open-envelope');
+        document.body.style.overflow = 'hidden'; // Zarf açılana kadar kaydırmayı kapat
+
+        if (openEnvelopeBtn) {
+            openEnvelopeBtn.addEventListener('click', () => {
+                envelopeOverlay.classList.add('fade-out');
+                document.body.style.overflow = 'auto'; // Kaydırmayı aç
+                // Overlay'i tamamen dom'dan gizle ki tıklanmasın
+                setTimeout(() => {
+                    envelopeOverlay.style.display = 'none';
+                }, 1000);
+            });
+        }
+
+        // Countdown Timer Logic
+        const eventDateStr = "{{ couple.event_date.isoformat() }}"; 
+        const eventDate = new Date(eventDateStr + "T00:00:00").getTime();
+
+        const countdownFn = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = eventDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownFn);
+                document.getElementById("days").innerHTML = "00";
+                document.getElementById("hours").innerHTML = "00";
+                document.getElementById("minutes").innerHTML = "00";
+                document.getElementById("seconds").innerHTML = "00";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerHTML = days < 10 ? '0' + days : days;
+            document.getElementById("hours").innerHTML = hours < 10 ? '0' + hours : hours;
+            document.getElementById("minutes").innerHTML = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("seconds").innerHTML = seconds < 10 ? '0' + seconds : seconds;
+        }, 1000);
+
+        // RSVP Form Submission Logic
+        document.getElementById('rsvp-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'İletiliyor...';
+
+            const payload = {
+                guest_name: document.getElementById('guest_name').value,
+                attendance_status: document.getElementById('attendance_status').value,
+                guest_count: parseInt(document.getElementById('guest_count').value),
+                message: document.getElementById('message').value
+            };
+
+            try {
+                const response = await fetch('/api/davetiye/{{ couple.slug }}/rsvp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    // Hide form and show success using CSS opacity transition ideally, but hidden works for now
+                    this.style.display = 'none';
+                    document.getElementById('form-success').classList.remove('hidden');
+                    document.getElementById('form-success').classList.add('fade-in');
+                } else {
+                    document.getElementById('form-error').classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Cevabımı İlet';
+                }
+            } catch (error) {
+                document.getElementById('form-error').classList.remove('hidden');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Cevabımı İlet';
+            }
+        });
+    </script>
+</body>
+</html>
